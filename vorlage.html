@@ -1,0 +1,109 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{TITEL}}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap">
+<style>
+:root{
+  --ground:#F6F3F9; --ink:#1E1826; --muted:#5C5468; --edge:#FFFFFF; --rahmen:#502379; --focus:#FDC220;
+  --t0:#DCCFEC; --t1:#CFE8F6; --t2:#FDEDC0; --t3:#CDEEDD; --t4:#C3AEE0;
+  --land:#F1EEF4; --nb:#E9E4EF; --nbhover:#DCD2E8; --nbline:#CFC6DA; --accent:#502379;
+  --halo:#FFFFFF; --tipbg:#1E1826; --tipink:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --ground:#15111B; --ink:#F1ECF7; --muted:#B3A9C1; --edge:#15111B; --rahmen:#C8B2EC;
+  --t0:#3B2E52; --t1:#1F3E52; --t2:#4A3D1E; --t3:#1F4535; --t4:#4B3868;
+  --land:#1A1521; --nb:#231C2C; --nbhover:#2F2539; --nbline:#3A3047; --accent:#C8B2EC;
+  --halo:#15111B; --tipbg:#F1ECF7; --tipink:#1E1826;}}
+:root[data-theme="dark"]{color-scheme:dark;
+  --ground:#15111B; --ink:#F1ECF7; --muted:#B3A9C1; --edge:#15111B; --rahmen:#C8B2EC;
+  --t0:#3B2E52; --t1:#1F3E52; --t2:#4A3D1E; --t3:#1F4535; --t4:#4B3868;
+  --land:#1A1521; --nb:#231C2C; --nbhover:#2F2539; --nbline:#3A3047; --accent:#C8B2EC;
+  --halo:#15111B; --tipbg:#F1ECF7; --tipink:#1E1826;}
+html,body{height:100%;margin:0}
+body{background:var(--ground);font-family:"Ubuntu",system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+svg{display:block;width:100%;height:100%}
+.land{fill:var(--land);stroke:none}
+.gm{stroke:var(--edge);stroke-width:1.4}
+.c0{fill:var(--t0)}.c1{fill:var(--t1)}.c2{fill:var(--t2)}.c3{fill:var(--t3)}.c4{fill:var(--t4)}
+a .gm{cursor:pointer}
+a:hover .gm,a:focus .gm{fill:var(--rahmen)}
+a:focus{outline:none}
+a:focus-visible .gm,a:focus-visible .nbA{stroke:var(--focus);stroke-width:4}
+.nbA{fill:var(--nb);stroke:var(--nbline);stroke-width:1.4}
+a:hover .nbA,a:focus .nbA{fill:var(--nbhover);cursor:pointer}
+.rahmen{fill:none;stroke:var(--rahmen);stroke-width:5;stroke-linejoin:round;pointer-events:none}
+.lbl{fill:var(--ink);font-weight:500;text-anchor:middle;pointer-events:none;
+     paint-order:stroke;stroke:var(--halo);stroke-width:2.6px;stroke-linejoin:round}
+.lbl.hot{fill:#FFFFFF;font-weight:700;stroke:none}
+.lbl.aussen{text-anchor:end}
+.lbl.aussen.re{text-anchor:start}
+.fahne{stroke:var(--muted);stroke-width:1;fill:none;pointer-events:none;opacity:.7}
+.nbl{fill:var(--accent);font-size:18px;font-weight:700;text-anchor:middle;pointer-events:none;opacity:.8;
+     paint-order:stroke;stroke:var(--halo);stroke-width:3px;stroke-linejoin:round}
+.tip{position:fixed;pointer-events:none;background:var(--tipbg);color:var(--tipink);font-size:13px;line-height:1.35;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:2}
+.tip b{font-weight:700}
+.tip span{opacity:.75}
+</style>
+</head><body>
+<svg id="map" role="group" aria-label="{{ARIA}}"></svg>
+<div class="tip" id="tip" hidden></div>
+<script>
+const D={{DATEN}};
+const NS='http://www.w3.org/2000/svg', svg=document.getElementById('map'), tip=document.getElementById('tip');
+let LINKS={ziel:'_top',flaechen:{},nachbarn:{}};
+function el(n,a){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function wrap(node,url,label){ if(!url) return node; const a=el('a',{href:url,target:LINKS.ziel||'_top','aria-label':label}); if((LINKS.ziel||'_top')==='_blank')a.setAttribute('rel','noopener'); a.appendChild(node); return a; }
+function showTip(e,html){tip.innerHTML=html;tip.hidden=false;const r=tip.getBoundingClientRect();let x=e.clientX+14,y=e.clientY+14;if(x+r.width>innerWidth-6)x=e.clientX-r.width-14;if(y+r.height>innerHeight-6)y=e.clientY-r.height-14;tip.style.left=x+'px';tip.style.top=y+'px';}
+function fit(){
+  const [fx,fy,fw,fh]=D.frame, ar=svg.clientWidth/Math.max(1,svg.clientHeight);
+  let w=fw, h=fh;
+  if(w/h<ar) w=h*ar; else h=w/ar;
+  const x=fx+fw/2-w/2, y=fy+fh/2-h/2;
+  svg.setAttribute('viewBox',`${x.toFixed(1)} ${y.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`);
+  for(const tn of svg.querySelectorAll('.nbl')){
+    const bx=+tn.dataset.bx, by=+tn.dataset.by, hw=tn.getComputedTextLength()/2+10;
+    tn.setAttribute('x',Math.max(x+hw,Math.min(bx,x+w-hw)));
+    tn.setAttribute('y',Math.max(y+28,Math.min(by,y+h-12)));
+  }
+}
+function fahnen(){
+  for(const t of svg.querySelectorAll('.lbl.aussen')){
+    const lx=+t.dataset.lx, ly=+t.dataset.ly, tx=+t.dataset.tx, ty=+t.dataset.ty;
+    const von=t.classList.contains('re')?tx-5:tx+5;
+    const ln=t.nextElementSibling;
+    if(ln&&ln.classList.contains('fahne')) ln.setAttribute('d',`M${von.toFixed(1)},${(ty-4).toFixed(1)}L${lx},${ly}`);
+  }
+}
+function build(){
+  svg.textContent='';
+  const gN=el('g'),gT=el('g'),gL=el('g'),gNL=el('g');
+  if(D.land) svg.appendChild(el('path',{d:D.land,class:'land'}));
+  for(const n of D.nb){
+    const cfg=LINKS.nachbarn[n.key]||{}, name=cfg.name||n.v;
+    const node=wrap(el('path',{d:n.d,class:'nbA'}),cfg.url,name);
+    node.addEventListener('mousemove',e=>showTip(e,`<b>${name}</b>`+(cfg.url?'':'<br><span>Hub-Adresse folgt</span>')));
+    node.addEventListener('mouseleave',()=>tip.hidden=true);
+    gN.appendChild(node);
+    const t=el('text',{class:'nbl',x:n.bx,y:n.by,'data-bx':n.bx,'data-by':n.by}); t.textContent=name; gNL.appendChild(t);
+  }
+  for(const x of D.g){
+    const cfg=(LINKS.flaechen||{})[x.ags]||{};
+    const node=wrap(el('path',{d:x.d,class:'gm c'+x.c}),cfg.url,x.name);
+    const tx=el('text',{class:'lbl'+(x.aussen?' aussen'+(x.seite==='r'?' re':''):''),'font-size':x.fs});
+    const ax=x.aussen?x.tx:x.lx, ay=x.aussen?x.ty:x.ly;
+    x.lines.forEach((l,i)=>{const s=el('tspan',{x:ax,y:(ay+(i-(x.lines.length-1)/2)*x.fs*1.06+x.fs*.35).toFixed(1)});s.textContent=l;tx.appendChild(s);});
+    node.addEventListener('mousemove',e=>showTip(e,`<b>${x.name}</b>`+(x.bez?`<br><span>${x.bez}</span>`:'')+(cfg.url?'':'<br><span>Seite folgt</span>')));
+    node.addEventListener('mouseenter',()=>{if(cfg.url&&!x.aussen)tx.classList.add('hot');});
+    node.addEventListener('mouseleave',()=>{tip.hidden=true;tx.classList.remove('hot');});
+    node.addEventListener('focus',()=>{if(cfg.url&&!x.aussen)tx.classList.add('hot');});
+    node.addEventListener('blur',()=>tx.classList.remove('hot'));
+    gT.appendChild(node); gL.appendChild(tx);
+    if(x.aussen){ Object.assign(tx.dataset,{lx:x.lx,ly:x.ly,tx:x.tx,ty:x.ty}); gL.appendChild(el('path',{class:'fahne',d:''})); }
+  }
+  svg.append(gN,gT,el('path',{d:D.rahmen,class:'rahmen'}),gL,gNL);
+  fit(); fahnen();
+}
+addEventListener('resize',fit);
+build();
+fetch('links.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j){LINKS=j;build();}}).catch(()=>{});
+</script>
+</body></html>

@@ -1,0 +1,196 @@
+{
+  "hinweis": "Adressen der Haiilo-Seiten eintragen. Leere Adresse = Fläche nicht anklickbar.",
+  "ziel": "_blank",
+  "flaechen": {
+    "08111": {
+      "name": "Stuttgart",
+      "url": "https://volt.haiilo.app/workspaces/de-bw-stuttgart/apps/content/startseite"
+    },
+    "08115": {
+      "name": "Böblingen",
+      "url": "https://volt.haiilo.app/workspaces/de-bw-boeblingen/apps/content/startseite"
+    },
+    "08116": {
+      "name": "Esslingen",
+      "url": ""
+    },
+    "08117": {
+      "name": "Göppingen",
+      "url": ""
+    },
+    "08118": {
+      "name": "Ludwigsburg",
+      "url": "https://kreiskarte-ludwigsburg.vercel.app"
+    },
+    "08119": {
+      "name": "Rems-Murr-Kreis",
+      "url": ""
+    },
+    "08121": {
+      "name": "Heilbronn (Stadtkreis)",
+      "url": "https://volt.haiilo.app/workspaces/de-bw-heilbronn/apps/content/startseite"
+    },
+    "08125": {
+      "name": "Heilbronn (Landkreis)",
+      "url": "https://volt.haiilo.app/workspaces/de-bw-heilbronn/apps/content/startseite"
+    },
+    "08126": {
+      "name": "Hohenlohekreis",
+      "url": ""
+    },
+    "08127": {
+      "name": "Schwäbisch Hall",
+      "url": ""
+    },
+    "08128": {
+      "name": "Main-Tauber-Kreis",
+      "url": ""
+    },
+    "08135": {
+      "name": "Heidenheim",
+      "url": ""
+    },
+    "08136": {
+      "name": "Ostalbkreis",
+      "url": ""
+    },
+    "08211": {
+      "name": "Baden-Baden",
+      "url": ""
+    },
+    "08212": {
+      "name": "Karlsruhe (Stadtkreis)",
+      "url": ""
+    },
+    "08215": {
+      "name": "Karlsruhe (Landkreis)",
+      "url": ""
+    },
+    "08216": {
+      "name": "Rastatt",
+      "url": ""
+    },
+    "08221": {
+      "name": "Heidelberg",
+      "url": ""
+    },
+    "08222": {
+      "name": "Mannheim",
+      "url": ""
+    },
+    "08225": {
+      "name": "Neckar-Odenwald-Kreis",
+      "url": ""
+    },
+    "08226": {
+      "name": "Rhein-Neckar-Kreis",
+      "url": ""
+    },
+    "08231": {
+      "name": "Pforzheim",
+      "url": ""
+    },
+    "08235": {
+      "name": "Calw",
+      "url": ""
+    },
+    "08236": {
+      "name": "Enzkreis",
+      "url": ""
+    },
+    "08237": {
+      "name": "Freudenstadt",
+      "url": ""
+    },
+    "08311": {
+      "name": "Freiburg im Breisgau",
+      "url": ""
+    },
+    "08315": {
+      "name": "Breisgau-Hochschwarzwald",
+      "url": ""
+    },
+    "08316": {
+      "name": "Emmendingen",
+      "url": ""
+    },
+    "08317": {
+      "name": "Ortenaukreis",
+      "url": ""
+    },
+    "08325": {
+      "name": "Rottweil",
+      "url": ""
+    },
+    "08326": {
+      "name": "Schwarzwald-Baar-Kreis",
+      "url": ""
+    },
+    "08327": {
+      "name": "Tuttlingen",
+      "url": ""
+    },
+    "08335": {
+      "name": "Konstanz",
+      "url": ""
+    },
+    "08336": {
+      "name": "Lörrach",
+      "url": ""
+    },
+    "08337": {
+      "name": "Waldshut",
+      "url": ""
+    },
+    "08415": {
+      "name": "Reutlingen",
+      "url": ""
+    },
+    "08416": {
+      "name": "Tübingen",
+      "url": ""
+    },
+    "08417": {
+      "name": "Zollernalbkreis",
+      "url": ""
+    },
+    "08421": {
+      "name": "Ulm",
+      "url": ""
+    },
+    "08425": {
+      "name": "Alb-Donau-Kreis",
+      "url": ""
+    },
+    "08426": {
+      "name": "Biberach",
+      "url": ""
+    },
+    "08435": {
+      "name": "Bodenseekreis",
+      "url": ""
+    },
+    "08436": {
+      "name": "Ravensburg",
+      "url": ""
+    },
+    "08437": {
+      "name": "Sigmaringen",
+      "url": ""
+    }
+  },
+  "nachbarn": {
+    "Bayern": {
+      "name": "Volt Bayern",
+      "url": ""
+    },
+    "Hessen": {
+      "name": "Volt Hessen",
+      "url": ""
+    },
+    "Rheinland-Pfalz": {
+      "name": "Volt Rheinland-Pfalz",
+      "url": ""
+    }
+  }
+}

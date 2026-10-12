@@ -1,0 +1,40 @@
+{
+  "quelle": "quellen/kreise_vg250.geojson",
+  "ebenen": [
+    {
+      "name": "bw",
+      "titel": "Volt-Karte Baden-Württemberg",
+      "aria": "Stadt- und Landkreise in Baden-Württemberg",
+      "ziel": ".",
+      "praefix": "08",
+      "beispiel_ags": "08118",
+      "breite": 1000,
+      "rand": 62,
+      "toleranz": 160,
+      "schrift_max": 19,
+      "schrift_min": 9.5,
+      "schrift_aussen": 12,
+      "nachbarn": {
+        "Bayern": {
+          "praefix": "09",
+          "name": "Volt Bayern"
+        },
+        "Hessen": {
+          "praefix": "06",
+          "name": "Volt Hessen"
+        },
+        "Rheinland-Pfalz": {
+          "praefix": "07",
+          "name": "Volt Rheinland-Pfalz"
+        }
+      },
+      "vorgaben": {
+        "08111": "https://volt.haiilo.app/workspaces/de-bw-stuttgart/apps/content/startseite",
+        "08115": "https://volt.haiilo.app/workspaces/de-bw-boeblingen/apps/content/startseite",
+        "08118": "https://kreiskarte-ludwigsburg.vercel.app",
+        "08121": "https://volt.haiilo.app/workspaces/de-bw-heilbronn/apps/content/startseite",
+        "08125": "https://volt.haiilo.app/workspaces/de-bw-heilbronn/apps/content/startseite"
+      }
+    }
+  ]
+}
