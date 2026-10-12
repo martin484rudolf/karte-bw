@@ -11,9 +11,7 @@
       "breite": 1000,
       "rand": 62,
       "toleranz": 160,
-      "schrift_max": 19,
-      "schrift_min": 9.5,
-      "schrift_aussen": 12,
+      "schrift_aussen": 11,
       "nachbarn": {
         "Bayern": {
           "praefix": "09",
@@ -34,7 +32,11 @@
         "08118": "https://kreiskarte-ludwigsburg.vercel.app",
         "08121": "https://volt.haiilo.app/workspaces/de-bw-heilbronn/apps/content/startseite",
         "08125": "https://volt.haiilo.app/workspaces/de-bw-heilbronn/apps/content/startseite"
-      }
+      },
+      "schrift_stufen": [
+        14,
+        11
+      ]
     }
   ]
 }

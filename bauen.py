@@ -160,20 +160,21 @@ def umbrueche(name, maximal_zeilen=3):
     return ergebnis
 
 
-def beste_schrift(name, radius, fs_max, fs_min):
-    """Größte Schriftgröße, mit der der Name in einen Kreis mit radius passt."""
-    bester = None
-    for zeilen in umbrueche(name):
-        breite = max(textbreite(z) for z in zeilen)
-        hoehe = 1.06 * len(zeilen)
-        fs = 2 * radius / math.hypot(breite, hoehe)
-        fs = min(fs, fs_max)
-        if bester is None or fs > bester[0] + 0.01 or (
-            abs(fs - bester[0]) <= 0.01 and len(zeilen) < len(bester[1])
-        ):
-            bester = (fs, zeilen)
-    fs, zeilen = bester
-    return (round(fs, 1), zeilen) if fs >= fs_min else (None, zeilen)
+def beste_schrift(name, radius, stufen):
+    """Erste Schriftgröße aus `stufen`, in der der Name in einen Kreis mit
+    radius passt – samt der dafür nötigen Zeilenaufteilung. Feste Stufen statt
+    stufenlos skalierter Schrift: sonst steht neben 19 pt ein 9-pt-Name und das
+    Kartenbild wird unruhig."""
+    varianten = umbrueche(name)
+    for fs in stufen:
+        passend = [
+            z for z in varianten
+            if fs <= 2 * radius / math.hypot(
+                max(textbreite(y) for y in z), 1.06 * len(z))
+        ]
+        if passend:
+            return fs, min(passend, key=len)
+    return None, min(varianten, key=len)
 
 
 def ankerpunkt(geom):
@@ -359,15 +360,14 @@ def baue_ebene(cfg, quelle):
     farbe = faerben(flaechen)
 
     # Flächen samt Beschriftung
-    fs_max = cfg.get("schrift_max", 19)
-    fs_min = cfg.get("schrift_min", 9.5)
+    stufen = cfg.get("schrift_stufen", [14, 11])
     eintraege, aussen = [], []
     for ags in sorted(flaechen):
         e = flaechen[ags]
         (ax, ay), r_m = ankerpunkt(e["geom"])
         lx, ly = nach_px(ax, ay)
         r_px = r_m / skala
-        fs, zeilen = beste_schrift(e["name"], r_px, fs_max, fs_min)
+        fs, zeilen = beste_schrift(e["name"], r_px, stufen)
         satz = {
             "ags": ags, "name": e["name"], "bez": e["bez"],
             "d": pfad_d(e["geom"], nach_px), "c": farbe[ags],
@@ -377,7 +377,7 @@ def baue_ebene(cfg, quelle):
             satz["fs"] = fs
             satz["lines"] = zeilen
         else:
-            satz["fs"] = cfg.get("schrift_aussen", 12)
+            satz["fs"] = cfg.get("schrift_aussen", stufen[-1])
             satz["lines"] = [e["name"]]
             satz["aussen"] = True
             aussen.append(satz)
@@ -399,7 +399,7 @@ def baue_ebene(cfg, quelle):
         s["_l"], s["_r"] = links_px - 12, rechts_px + 12
         s["seite"] = "l" if (s["lx"] - links_px) <= (rechts_px - s["lx"]) else "r"
 
-    abstand = cfg.get("schrift_aussen", 12) * 1.5
+    abstand = cfg.get("schrift_aussen", stufen[-1]) * 1.5
     for seite in ("l", "r"):
         gruppe = sorted([s for s in aussen if s["seite"] == seite], key=lambda s: s["ly"])
         y = None
