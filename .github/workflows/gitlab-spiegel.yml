@@ -1,0 +1,29 @@
+# Spiegelt main bei jedem Push nach GitLab (z. B. Volt-GitLab). GitHub bleibt die Quelle.
+#
+# Einrichtung im GitHub-Repo unter Settings → Secrets and variables → Actions:
+#   Variable GITLAB_MIRROR_URL  = Adresse des GitLab-Projekts ohne https://, z. B. gitlab.com/volt-gruppe/sprachbuddy.git
+#   Secret   GITLAB_TOKEN       = Zugangstoken mit Recht write_repository
+# Im GitLab-Projekt: leeres Projekt anlegen (ohne README); unter Settings → Repository → Protected branches
+# für main „Allowed to force push" erlauben, sonst lehnt GitLab den Spiegel-Push ab.
+name: Spiegel nach GitLab
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  spiegeln:
+    runs-on: ubuntu-latest
+    if: ${{ vars.GITLAB_MIRROR_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: main nach GitLab schieben
+        env:
+          ZIEL: ${{ vars.GITLAB_MIRROR_URL }}
+          TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "GITLAB_TOKEN fehlt (Settings → Secrets → Actions)"; exit 1; fi
+          git push --force "https://oauth2:${TOKEN}@${ZIEL}" HEAD:refs/heads/main
