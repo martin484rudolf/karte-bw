@@ -42,6 +42,24 @@ a:hover .nbA,a:focus .nbA{fill:var(--nbhover);cursor:pointer}
 .tip{position:fixed;pointer-events:none;background:var(--tipbg);color:var(--tipink);font-size:13px;line-height:1.35;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:2}
 .tip b{font-weight:700}
 .tip span{opacity:.75}
+/* Glasfaser-Ebene */
+.gfbar{position:fixed;left:10px;top:10px;z-index:3;display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:13px;color:var(--ink)}
+.gfbtn{font:inherit;font-weight:700;background:var(--accent);color:var(--ground);border:0;border-radius:6px;padding:6px 12px;cursor:pointer}
+.gfbtn[aria-pressed="true"]{background:var(--focus);color:#1E1826}
+.gfbtn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.gfpanel{display:flex;flex-direction:column;gap:6px;max-width:250px;background:var(--ground);border:1px solid var(--nbline);border-radius:8px;padding:8px 10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.gfpanel[hidden]{display:none}
+.gfpanel label{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.gfpanel select{font:inherit;max-width:160px}
+.gfleg{max-width:100%;background:#fff;border-radius:4px}
+.gflaedt{color:var(--muted);font-style:italic}
+.gfquelle{font-size:11px;line-height:1.35;color:var(--muted)}
+.gfquelle a{color:inherit}
+.gfimg{pointer-events:none}
+svg.gf .gm{fill:transparent;stroke:var(--accent);stroke-width:1;stroke-opacity:.6}
+svg.gf a:hover .gm,svg.gf a:focus .gm{fill:var(--accent);fill-opacity:.18}
+svg.gf .lbl{stroke:none;paint-order:normal;text-shadow:0 0 2px var(--ground),0 0 2px var(--ground),0 0 3px var(--ground)}
+svg.gf .lbl.hot{fill:var(--ink)}
 </style>
 </head><body>
 <svg id="map" role="group" aria-label="{{ARIA}}"></svg>
@@ -102,6 +120,63 @@ function build(){
   svg.append(gN,gT,el('path',{d:D.rahmen,class:'rahmen'}),gL,gNL);
   fit(); fahnen();
 }
+const GF_KARTE={bereich:[0,0,D.w,D.h],ansichten:[{n:'gem',mpp:90,t:'je Gemeinde, Ortsteile in der Kreiskarte'}]};
+/* Glasfaser-Ebene: Breitbandatlas der Bundesnetzagentur (WMS) als Bild unter die Gemeindegrenzen legen.
+   Ebenennamen ändern sich mit dem Datenstand – bei neuem Stand hier anpassen (GetCapabilities). */
+const GF={
+  dienst:'https://breitbandatlas-wms.gigabit-grundbuch.online/WMS/Breitbandatlas',
+  stand:'12/2025',
+  klassen:[
+    {t:'Privathaushalte ≥ 1000 Mbit/s',
+     raster:'Breitband_Festnetz__100m_Gitter__Privathaushalte_≥_1000_Mbit/s41271',
+     gem:'Breitband_Festnetz__Gemeinden__Privathaushalte_≥_1000_Mbit/s43724'},
+    {t:'Glasfaser (FTTB/H)',
+     raster:'Breitband_Festnetz__100m_Gitter__Glasfaser_(FTTB/H)_≥_1000_Mbit/s44392',
+     gem:'Breitband_Festnetz__Gemeinden__Glasfaser_(FTTB/H)_≥_1000_Mbit/s34627'}
+  ],
+  ...GF_KARTE
+};
+let gfAn=/glasfaser/i.test(location.hash), gfKlasse=0, gfAnsicht=0, gfDeck=0.9;
+const gfBar=document.createElement('div'); gfBar.className='gfbar';
+gfBar.innerHTML=`<button type="button" class="gfbtn" aria-pressed="false">Glasfaser</button>
+<div class="gfpanel" hidden>
+<label>Klasse <select class="gfsel">${GF.klassen.map((k,i)=>`<option value="${i}">${k.t}</option>`).join('')}</select></label>
+`+(GF.ansichten.length>1?`<label>Ansicht <select class="gfans">${GF.ansichten.map((a,i)=>`<option value="${i}">${a.t}</option>`).join('')}</select></label>`:'')+`
+<label>Deckkraft <input class="gfdeck" type="range" min="30" max="100" value="90"></label>
+<div class="gflaedt">Karte lädt …</div>
+<img class="gfleg" alt="Legende: Anteil der Haushalte mit dieser Versorgung">
+<div class="gfquelle"><span class="gfhinw"></span> · Quelle: <a href="https://gigabitgrundbuch.bund.de/GIGA/DE/Breitbandatlas/start.html" target="_blank" rel="noopener">Breitbandatlas</a>, © BNetzA, Datenstand ${GF.stand}</div>
+</div>`;
+document.body.appendChild(gfBar);
+const gfBtn=gfBar.querySelector('.gfbtn'), gfPanel=gfBar.querySelector('.gfpanel'), gfLeg=gfBar.querySelector('.gfleg'), gfLaedt=gfBar.querySelector('.gflaedt');
+function gfUrl(ebene){
+  const [a,b,c,d]=GF.bereich, g=D.geo;
+  const X0=g.x+a*g.sx, X1=g.x+c*g.sx, Y1=g.y-b*g.sy, Y0=g.y-d*g.sy;
+  const mpp=GF.ansichten[gfAnsicht].mpp, w=Math.ceil((X1-X0)/mpp), h=Math.ceil((Y1-Y0)/mpp);
+  return `${GF.dienst}?service=WMS&version=1.3.0&request=GetMap&styles=&crs=EPSG:25832&format=image/png&transparent=true`+
+    `&layers=${encodeURIComponent(ebene)}&bbox=${X0.toFixed(0)},${Y0.toFixed(0)},${X1.toFixed(0)},${Y1.toFixed(0)}&width=${w}&height=${h}`;
+}
+function gfApply(){
+  svg.classList.toggle('gf',gfAn);
+  gfBtn.setAttribute('aria-pressed',String(gfAn)); gfPanel.hidden=!gfAn;
+  const alt=svg.querySelector('.gfimg'); if(alt) alt.remove();
+  if(!gfAn) return;
+  const ans=GF.ansichten[gfAnsicht], ebene=GF.klassen[gfKlasse][ans.n], [a,b,c,d]=GF.bereich;
+  gfBar.querySelector('.gfhinw').textContent=ans.t;
+  const im=el('image',{class:'gfimg',x:a,y:b,width:c-a,height:d-b,preserveAspectRatio:'none',opacity:gfDeck});
+  gfLaedt.hidden=false;
+  im.addEventListener('load',()=>gfLaedt.hidden=true);
+  im.addEventListener('error',()=>gfLaedt.textContent='Breitbandatlas gerade nicht erreichbar');
+  im.setAttribute('href',gfUrl(ebene));
+  const erste=svg.querySelector('.gm'), gruppe=erste&&erste.closest('g');
+  svg.insertBefore(im,gruppe||null);
+  gfLeg.src=`${GF.dienst}?request=GetLegendGraphic&version=1.3.0&format=image/png&layer=${encodeURIComponent(ebene)}`;
+}
+gfBtn.addEventListener('click',()=>{gfAn=!gfAn;history.replaceState(null,'',gfAn?'#glasfaser':location.pathname+location.search);gfApply();});
+gfBar.querySelector('.gfsel').addEventListener('change',e=>{gfKlasse=+e.target.value;gfApply();});
+const gfAns=gfBar.querySelector('.gfans'); if(gfAns) gfAns.addEventListener('change',e=>{gfAnsicht=+e.target.value;gfApply();});
+gfBar.querySelector('.gfdeck').addEventListener('input',e=>{gfDeck=e.target.value/100;const im=svg.querySelector('.gfimg');if(im)im.setAttribute('opacity',gfDeck);});
+const gfBuild=build; build=function(){gfBuild();gfApply();};
 addEventListener('resize',fit);
 build();
 fetch('links.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j){LINKS=j;build();}}).catch(()=>{});

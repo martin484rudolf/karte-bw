@@ -425,6 +425,9 @@ def baue_ebene(cfg, quelle):
 
     daten = {
         "w": breite, "h": hoehe,
+        # Bezug zu UTM32 (EPSG:25832) fuer die Glasfaser-Ebene: Bildpunkt (0,0) und Meter je Bildpunkt
+        "geo": {"x": round(x0 - rand * skala, 1), "y": round(y1 + rand * skala, 1),
+                "sx": round(skala, 4), "sy": round(skala, 4)},
         "frame": [round(fx0, 1), 0, round(fx1 - fx0, 1), hoehe],
         "land": pfad_d(land, nach_px),
         "rahmen": pfad_d(umriss, nach_px),
