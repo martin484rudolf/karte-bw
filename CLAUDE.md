@@ -4,10 +4,10 @@ Angelegt am 28.10.2026 für die KI-Regeln von Volt. Projektregeln folgen bei Bed
 
 ## KI-Regeln von Volt (hart, gelten in jeder Sitzung)
 
-Quelle: `Handshake/projects/ki-konzept/volt-ki-regeln.md` (bisher ein unvollständiger
-Auszug eines englischen Volt-Dokuments). Anwendung, Datenklassen und Vorfall-Ablauf:
-`Handshake/projects/ki-konzept/2026-10-28_ki-nutzungskonzept_v0.1.md`.
-Die Regeln gelten lokal wie in der Cloud, auch wenn Handshake nicht ausgecheckt ist.
+Original: `Documents\Claude\Volt\KI-Werkstatt\` auf Martins PC, Regeln in `01_Regeln\`
+(Konzept: `2026-10-28_ki-nutzungskonzept_v0.1.md`). Spiegel für Cloud-Sitzungen und Vibe:
+`Handshake/projects/ki-konzept/`. Geändert wird nur in der Werkstatt.
+Die Regeln gelten lokal wie in der Cloud, auch wenn keine der beiden Ablagen erreichbar ist.
 Zweck: Fehlbedienung und Impulsivität im Umgang mit KI verhindern.
 
 1. **Keine personenbezogenen oder Dritt-Daten in eine KI-Verarbeitung geben**,
